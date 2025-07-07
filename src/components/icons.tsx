@@ -1,15 +1,16 @@
-import Image from 'next/image';
-import type { ComponentProps } from 'react';
+import type { ImgHTMLAttributes } from 'react';
 
-// Omit src and alt as we are setting them, but allow other Image props to be passed.
-type AppLogoProps = Omit<ComponentProps<typeof Image>, 'src' | 'alt'>;
+// Omit src and alt as we are setting them, but allow other img props to be passed.
+type AppLogoProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'>;
 
 export function AppLogo(props: AppLogoProps) {
-  // Set default width and height, which can be overridden by props or className.
+  // Set default width and height, which can be overridden by props.
   const { width = 48, height = 48, ...rest } = props;
 
   return (
-    <Image
+    // Using a standard img tag to ensure compatibility and fix rendering issues.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src="/logo.png"
       alt="Senibong Indah Logo"
       width={width}
@@ -17,4 +18,3 @@ export function AppLogo(props: AppLogoProps) {
       {...rest}
     />
   );
-}
