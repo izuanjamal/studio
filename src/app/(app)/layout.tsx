@@ -47,6 +47,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.push('/login');
   }
 
+  const homePath = userRole === 'admin' ? '/dashboard' : '/resident';
+
   const navItems = userRole === 'admin' ? [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", "tooltip": "Dashboard" },
   ] : [
@@ -79,8 +81,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarFooter>
            <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/'} tooltip="Home">
-                    <Link href="/">
+                <SidebarMenuButton asChild isActive={pathname === homePath} tooltip="Home">
+                    <Link href={homePath}>
                         <Home />
                         <span>Home</span>
                     </Link>
@@ -132,7 +134,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuLabel>{userRole && (userRole === 'admin' ? 'Admin' : 'Resident')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/">Home</Link>
+                    <Link href={homePath}>Home</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
