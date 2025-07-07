@@ -132,6 +132,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuLabel>{userRole && (userRole === 'admin' ? 'Admin' : 'Resident')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+                    <Link href="/">Home</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
