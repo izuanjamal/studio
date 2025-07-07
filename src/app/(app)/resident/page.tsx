@@ -1,7 +1,12 @@
 import { ParkingDetails } from "@/components/resident/parking-details";
 import { AssignmentHistory } from "@/components/resident/assignment-history";
+import { mockAssignments } from "@/lib/mock-data";
 
 export default function ResidentPage() {
+  // In a real app, you would fetch the specific resident's data.
+  // Here, we'll use the first assignment as a mock for the logged-in user.
+  const currentAssignment = mockAssignments[0];
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -13,7 +18,7 @@ export default function ResidentPage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <ParkingDetails />
+          <ParkingDetails assignment={currentAssignment} />
         </div>
         <div className="lg:col-span-2">
           <AssignmentHistory />

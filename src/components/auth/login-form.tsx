@@ -24,14 +24,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { AppLogo } from '@/components/icons';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
-  role: z.enum(['admin', 'resident'], { required_error: 'You need to select a role.' }),
 });
 
 export function LoginForm() {
@@ -44,30 +42,21 @@ export function LoginForm() {
     defaultValues: {
       email: '',
       password: '',
-      role: 'resident',
     },
   });
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
-    // Simulate API call
+    // Simulate API call and role-based redirect
     setTimeout(() => {
-      if (values.role === 'admin') {
-        if (values.email === 'admin@example.com' && values.password === 'password') {
-          toast({
-            title: 'Login Successful',
-            description: 'Welcome, Admin! Redirecting to your dashboard.',
-          });
-          router.push('/dashboard');
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Invalid Credentials',
-            description: 'Please check your admin email and password.',
-          });
-        }
+      if (values.email === 'admin@example.com' && values.password === 'password') {
+        toast({
+          title: 'Login Successful',
+          description: 'Welcome, Admin! Redirecting to your dashboard.',
+        });
+        router.push('/dashboard');
       } else {
-        // For residents, we'll just mock a successful login
+        // For any other credentials, assume it's a resident
         toast({
           title: 'Login Successful',
           description: `Welcome! Redirecting to your portal.`,
@@ -111,36 +100,6 @@ export function LoginForm() {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Login as</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex space-x-4"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="resident" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Resident</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="admin" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Admin</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

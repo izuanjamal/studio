@@ -1,11 +1,38 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileDown, PlusCircle } from "lucide-react";
+import { FileDown, PlusCircle, Trash2 } from "lucide-react";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { AssignmentChart } from "@/components/dashboard/assignment-chart";
 import { AssignmentTable } from "@/components/dashboard/assignment-table";
 import { mockAssignments } from "@/lib/mock-data";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import type { Assignment } from "@/types";
 
 export default function DashboardPage() {
+  const [assignments, setAssignments] = useState<Assignment[]>(mockAssignments);
+  const { toast } = useToast();
+
+  const handleResetAssignments = () => {
+    setAssignments([]);
+    toast({
+      title: "Assignments Reset",
+      description: "All parking assignments have been cleared.",
+    });
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -24,6 +51,29 @@ export default function DashboardPage() {
             <PlusCircle className="mr-2 h-4 w-4" />
             Generate Assignments
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Reset Assignments
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all
+                  assignment data from the system.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleResetAssignments}>
+                  Yes, reset assignments
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
@@ -38,7 +88,7 @@ export default function DashboardPage() {
         </div>
       </div>
       
-      <AssignmentTable assignments={mockAssignments} />
+      <AssignmentTable assignments={assignments} />
     </div>
   );
 }
