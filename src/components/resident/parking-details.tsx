@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
@@ -26,7 +27,7 @@ export function ParkingDetails({ assignment }: ParkingDetailsProps) {
             </div>
         </div>
         <p className="mt-4 text-xl font-semibold">Section {assignment.section}</p>
-        <p className="text-muted-foreground">Assigned on {assignment.assignedAt.toLocaleDateString()}</p>
+        <p className="text-muted-foreground">Assigned on {format(assignment.assignedAt, 'PPP')}</p>
       </CardContent>
       <CardFooter>
         <Dialog>
@@ -60,7 +61,7 @@ export function ParkingDetails({ assignment }: ParkingDetailsProps) {
                  <Separator />
                 <InfoRow icon={<Car className="h-4 w-4 text-muted-foreground" />} label="Parking Lot" value={`${assignment.parkingLotNumber} (Section ${assignment.section})`} />
                  <Separator />
-                <InfoRow icon={<Calendar className="h-4 w-4 text-muted-foreground" />} label="Date Issued" value={assignment.assignedAt.toLocaleDateString()} />
+                <InfoRow icon={<Calendar className="h-4 w-4 text-muted-foreground" />} label="Date Issued" value={format(assignment.assignedAt, 'PPP')} />
               </div>
             </div>
           </DialogContent>

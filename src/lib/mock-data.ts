@@ -19,6 +19,10 @@ export const mockAssignments: Assignment[] = Array.from({ length: 105 }, (_, i) 
   else if (i + 1 <= 131) section = 'C';
   else section = 'D';
 
+  // Use a static date to avoid hydration mismatch
+  const baseDate = new Date('2024-07-01T00:00:00Z');
+  baseDate.setDate(baseDate.getDate() - (i % 30));
+
   return {
     id: `asg-${i + 1}`,
     unitId: `unit-${i + 1}`,
@@ -27,6 +31,6 @@ export const mockAssignments: Assignment[] = Array.from({ length: 105 }, (_, i) 
     parkingLotId: `lot-R${i + 1}`,
     parkingLotNumber: `R${i + 1}`,
     section: section,
-    assignedAt: new Date(new Date().setDate(new Date().getDate() - (i % 30))),
+    assignedAt: baseDate,
   };
 });
