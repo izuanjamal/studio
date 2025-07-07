@@ -10,10 +10,32 @@ import { Separator } from "@/components/ui/separator";
 import type { Assignment } from '@/types';
 
 type ParkingDetailsProps = {
-  assignment: Assignment;
+  assignment?: Assignment;
 };
 
 export function ParkingDetails({ assignment }: ParkingDetailsProps) {
+  if (!assignment) {
+    return (
+      <Card className="h-full flex flex-col justify-between">
+        <CardHeader>
+          <CardTitle className="font-headline">Current Assignment</CardTitle>
+          <CardDescription>Your designated parking lot.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-muted-foreground py-8">
+            <p>No active assignment found.</p>
+          </div>
+        </CardContent>
+        <CardFooter>
+            <Button className="w-full" variant="outline" disabled>
+              <QrCode className="mr-2 h-4 w-4" />
+              View Digital Permit
+            </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-full">
       <CardHeader>

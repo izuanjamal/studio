@@ -2,13 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for assignment history
-const history = [
-  { id: 1, lot: "R78", section: "B", from: "2023-11-01", to: "Present", status: "Active" },
-  { id: 2, lot: "R15", section: "A", from: "2023-05-01", to: "2023-10-31", status: "Expired" },
-  { id: 3, lot: "R192", section: "D", from: "2022-11-01", to: "2023-04-30", status: "Expired" },
-  { id: 4, lot: "R44", section: "A", from: "2022-05-01", to: "2022-10-31", status: "Expired" },
-];
+// Mock data for assignment history cleared for publishing.
+const history: any[] = [];
 
 export function AssignmentHistory() {
   return (
@@ -30,7 +25,7 @@ export function AssignmentHistory() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {history.map((item) => (
+                {history.length > 0 ? history.map((item) => (
                 <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.lot}</TableCell>
                     <TableCell>{item.section}</TableCell>
@@ -42,7 +37,13 @@ export function AssignmentHistory() {
                     </Badge>
                     </TableCell>
                 </TableRow>
-                ))}
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      No assignment history found.
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
             </Table>
         </div>
