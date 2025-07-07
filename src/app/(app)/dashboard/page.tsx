@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown, PlusCircle, Trash2 } from "lucide-react";
 import { StatsCards } from "@/components/dashboard/stats-cards";
@@ -18,36 +18,39 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import type { Assignment } from "@/types";
 import { getAllAssignments, deleteAllAssignments } from "@/lib/firestore";
+import { generateAssignments } from "@/ai/flows/generate-assignments-flow";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 export default function DashboardPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const fetchedAssignments = await getAllAssignments();
-        setAssignments(fetchedAssignments);
-      } catch (error) {
-        console.error("Error fetching assignments:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load parking assignments.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAssignments();
+  const fetchAssignments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const fetchedAssignments = await getAllAssignments();
+      setAssignments(fetchedAssignments);
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load parking assignments.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [toast]);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
 
   const handleResetAssignments = async () => {
     try {
@@ -67,7 +70,64 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) {
+  const handleExportData = () => {
+    if (assignments.length === 0) {
+      toast({
+        title: "No Data",
+        description: "There is no assignment data to export.",
+      });
+      return;
+    }
+
+    const headers = ['Unit Number', 'Resident Name', 'Parking Lot', 'Section', 'Date Assigned'];
+    const csvRows = [
+      headers.join(','),
+      ...assignments.map(item => [
+        `"${item.unitNumber}"`,
+        `"${item.residentName}"`,
+        `"${item.parkingLotNumber}"`,
+        `"${item.section}"`,
+        `"${format(item.assignedAt, 'yyyy-MM-dd')}"`
+      ].join(','))
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `parking-assignments-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleGenerateAssignments = async () => {
+    setIsGenerating(true);
+    try {
+      const result = await generateAssignments();
+      if (result.success) {
+        toast({
+          title: "Generation Complete",
+          description: result.message,
+        });
+        await fetchAssignments(); // Refresh data
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      console.error("Error generating assignments:", error);
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Could not generate new assignments.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+
+  if (loading && assignments.length === 0) {
     return (
       <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
@@ -97,28 +157,14 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" disabled>
-                <FileDown className="mr-2 h-4 w-4" />
-                Export Data
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Feature coming soon</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button disabled>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Generate Assignments
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Feature coming soon</p>
-            </TooltipContent>
-          </Tooltip>
+          <Button variant="outline" onClick={handleExportData}>
+            <FileDown className="mr-2 h-4 w-4" />
+            Export Data
+          </Button>
+          <Button onClick={handleGenerateAssignments} disabled={isGenerating}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {isGenerating ? "Generating..." : "Generate Assignments"}
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">
