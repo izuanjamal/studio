@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { QrCode, Building, Calendar, User } from "lucide-react";
+import { QrCode, Building, Calendar, User, Car } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export function ParkingDetails() {
