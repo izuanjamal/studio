@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Car, User, LogOut, Settings } from "lucide-react";
+import { LayoutDashboard, Car, User, LogOut, Settings, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -78,6 +78,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarContent>
         <SidebarFooter>
            <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/'} tooltip="Home">
+                    <Link href="/">
+                        <Home />
+                        <span>Home</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === '/profile'} tooltip="Profile">
                     <Link href="/profile">
