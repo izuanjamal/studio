@@ -27,6 +27,7 @@ const mockUser = {
 const profileSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
+  unitNumber: z.string().min(1, { message: 'Unit number is required.' }).regex(/^L\d{2}-\d{2}$/, 'Invalid format. Use L##-## (e.g., L05-02)'),
 });
 
 export default function ProfilePage() {
@@ -39,6 +40,7 @@ export default function ProfilePage() {
     defaultValues: {
       fullName: user.fullName,
       email: user.email,
+      unitNumber: user.unitNumber,
     },
   });
 
@@ -48,6 +50,7 @@ export default function ProfilePage() {
       form.reset({
         fullName: user.fullName,
         email: user.email,
+        unitNumber: user.unitNumber,
       });
     }
   }, [isDialogOpen, user, form]);
@@ -108,6 +111,19 @@ export default function ProfilePage() {
                                             <FormLabel>Full Name</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Siti Nurhaliza" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="unitNumber"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Unit Number</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="L05-02" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
