@@ -67,7 +67,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <AppLogo className="w-8 h-8" />
-            <span className="text-lg font-semibold">ParkAssign PSI</span>
+            <span className="text-lg font-semibold">Senibong Indah</span>
           </div>
         </SidebarHeader>
         <SidebarContent>

@@ -4,7 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/components/providers/auth-provider';
 
 export const metadata: Metadata = {
-  title: 'ParkAssign PSI',
+  title: 'Pangsapuri Senibong Indah',
   description: 'Parking Lot Management System for Pangsapuri Senibong Indah',
 };
 

@@ -86,7 +86,7 @@ export function LoginForm() {
         <div className="mx-auto h-12 w-12">
             <AppLogo />
         </div>
-        <CardTitle className="text-2xl font-headline">ParkAssign PSI</CardTitle>
+        <CardTitle className="text-2xl font-headline">Pangsapuri Senibong Indah</CardTitle>
         <CardDescription>Enter your credentials to access your portal.</CardDescription>
       </CardHeader>
       <CardContent>

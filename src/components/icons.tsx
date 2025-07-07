@@ -11,7 +11,7 @@ export function AppLogo(props: AppLogoProps) {
   return (
     <Image
       src="/logo.png"
-      alt="ParkAssign PSI Logo"
+      alt="Senibong Indah Logo"
       width={width}
       height={height}
       {...rest}
