@@ -72,7 +72,7 @@ export function LoginForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <div className="mx-auto h-12 w-12 text-accent">
+        <div className="mx-auto h-12 w-12">
             <AppLogo />
         </div>
         <CardTitle className="text-2xl font-headline">ParkAssign PSI</CardTitle>

@@ -60,7 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <AppLogo className="w-8 h-8 text-accent" />
+            <AppLogo className="w-8 h-8" />
             <span className="text-lg font-semibold">ParkAssign PSI</span>
           </div>
         </SidebarHeader>
