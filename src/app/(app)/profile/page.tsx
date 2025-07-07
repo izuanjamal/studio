@@ -1,13 +1,21 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { User, Building, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock user data. In a real app, this would come from a session or context.
-const user = {
+const mockUser = {
   fullName: "Siti Nurhaliza",
   email: "siti.nurhaliza@example.com",
   unitNumber: "L05-02",
@@ -15,7 +23,49 @@ const user = {
   avatarFallback: "SN",
 };
 
+const profileSchema = z.object({
+  fullName: z.string().min(1, { message: 'Full name is required.' }),
+  email: z.string().email({ message: 'Please enter a valid email.' }),
+});
+
 export default function ProfilePage() {
+  const [user, setUser] = useState(mockUser);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof profileSchema>>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      fullName: user.fullName,
+      email: user.email,
+    },
+  });
+
+  // This will reset the form with the latest user data when the dialog is opened.
+  useEffect(() => {
+    if (isDialogOpen) {
+      form.reset({
+        fullName: user.fullName,
+        email: user.email,
+      });
+    }
+  }, [isDialogOpen, user, form]);
+
+  const onSubmit = (values: z.infer<typeof profileSchema>) => {
+    // Simulate updating user data
+    setUser(prevUser => ({
+        ...prevUser,
+        ...values,
+        // Regenerate fallback if name changes
+        avatarFallback: values.fullName.split(' ').map(n => n[0]).join('').toUpperCase(),
+    }));
+    toast({
+        title: "Profile Updated",
+        description: "Your profile information has been successfully updated.",
+    });
+    setIsDialogOpen(false); // Close the dialog
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -36,7 +86,55 @@ export default function ProfilePage() {
               <CardTitle className="text-3xl font-bold">{user.fullName}</CardTitle>
               <CardDescription className="text-base">{user.email}</CardDescription>
                <div className="pt-2">
-                 <Button>Edit Profile</Button>
+                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>Edit Profile</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit Profile</DialogTitle>
+                            <DialogDescription>
+                                Make changes to your profile here. Click save when you're done.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                                <FormField
+                                    control={form.control}
+                                    name="fullName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Full Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Siti Nurhaliza" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="name@example.com" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="secondary">Cancel</Button>
+                                    </DialogClose>
+                                    <Button type="submit">Save Changes</Button>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                 </Dialog>
               </div>
             </div>
           </div>
