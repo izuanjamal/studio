@@ -26,6 +26,8 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { AppLogo } from '@/components/icons';
+import { useAuth } from '@/hooks/use-auth';
+import { createUserDocument } from '@/lib/firestore';
 
 const registerSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -38,6 +40,7 @@ export function RegisterForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { signUpWithEmail } = useAuth();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -49,18 +52,34 @@ export function RegisterForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof registerSchema>) => {
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
-    // Simulate API call for registration
-    setTimeout(() => {
-      console.log(values);
+    try {
+      const userCredential = await signUpWithEmail(values.email, values.password);
+      const user = userCredential.user;
+
+      await createUserDocument(user.uid, {
+        email: values.email,
+        fullName: values.fullName,
+        unitNumber: values.unitNumber,
+      });
+
       toast({
         title: 'Registration Successful',
         description: 'Your account has been created. Please log in.',
       });
       router.push('/');
-      setIsLoading(false);
-    }, 1000);
+
+    } catch (error: any) {
+      console.error(error);
+       toast({
+        title: 'Registration Failed',
+        description: error.message || 'An unexpected error occurred.',
+        variant: 'destructive',
+      });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (

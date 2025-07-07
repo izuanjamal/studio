@@ -2,11 +2,36 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/hooks/use-auth";
+import { auth } from "@/lib/firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handlePasswordReset = async () => {
+    if (user?.email) {
+      try {
+        await sendPasswordResetEmail(auth, user.email);
+        toast({
+          title: "Password Reset Email Sent",
+          description: `An email has been sent to ${user.email} with instructions to reset your password.`,
+        });
+      } catch (error: any) {
+        console.error("Error sending password reset email:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to send password reset email.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -21,23 +46,11 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle>Change Password</CardTitle>
             <CardDescription>
-                For security, you will be logged out after changing your password.
+                Click the button below to receive a password reset link via email.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="current-password">Current Password</Label>
-              <Input id="current-password" type="password" placeholder="••••••••" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="new-password">New Password</Label>
-              <Input id="new-password" type="password" placeholder="••••••••" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input id="confirm-password" type="password" placeholder="••••••••" />
-            </div>
-             <Button>Update Password</Button>
+          <CardContent>
+             <Button onClick={handlePasswordReset}>Send Password Reset Email</Button>
           </CardContent>
         </Card>
 

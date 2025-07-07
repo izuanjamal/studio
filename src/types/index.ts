@@ -1,12 +1,23 @@
+import { Timestamp } from "firebase/firestore";
+
+export type User = {
+  uid: string;
+  email: string;
+  fullName: string;
+  unitNumber: string;
+  avatarUrl: string;
+  role: 'admin' | 'resident';
+};
+
 export type Assignment = {
-  id: string;
-  unitId: string;
+  id: string; // Firestore document ID
+  residentId: string; // UID of the user
   unitNumber: string;
   residentName: string;
   parkingLotId: string;
   parkingLotNumber: string;
   section: 'A' | 'B' | 'C' | 'D';
-  assignedAt: Date;
+  assignedAt: Date | Timestamp;
 };
 
 export type Unit = {
@@ -14,6 +25,7 @@ export type Unit = {
   unitNumber: string;
   floorLevel: number | 'G';
   residentName?: string;
+  residentId?: string; // UID of the user
 };
 
 export type ParkingLot = {
@@ -21,4 +33,5 @@ export type ParkingLot = {
   lotNumber: string;
   section: 'A' | 'B' | 'C' | 'D';
   isAssigned: boolean;
+  assignedTo?: string; // UID of the user
 };

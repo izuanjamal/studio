@@ -1,16 +1,19 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import type { Assignment } from "@/types";
+import { format } from "date-fns";
 
-// Mock data for assignment history cleared for publishing.
-const history: any[] = [];
+type AssignmentHistoryProps = {
+  assignments: Assignment[];
+}
 
-export function AssignmentHistory() {
+export function AssignmentHistory({ assignments }: AssignmentHistoryProps) {
   return (
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="font-headline">Assignment History</CardTitle>
-        <CardDescription>Your past parking lot assignments.</CardDescription>
+        <CardDescription>Your past and current parking lot assignments.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="border rounded-md">
@@ -19,27 +22,32 @@ export function AssignmentHistory() {
                 <TableRow>
                 <TableHead>Parking Lot</TableHead>
                 <TableHead>Section</TableHead>
-                <TableHead>From</TableHead>
-                <TableHead>To</TableHead>
+                <TableHead>Date Assigned</TableHead>
                 <TableHead>Status</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {history.length > 0 ? history.map((item) => (
+                {assignments.length > 0 ? assignments.map((item, index) => (
                 <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.lot}</TableCell>
+                    <TableCell className="font-medium">{item.parkingLotNumber}</TableCell>
                     <TableCell>{item.section}</TableCell>
-                    <TableCell>{item.from}</TableCell>
-                    <TableCell>{item.to}</TableCell>
+                    <TableCell>{format(item.assignedAt, "PPP")}</TableCell>
                     <TableCell>
-                    <Badge variant={item.status === 'Active' ? 'default' : 'secondary'} className={item.status === 'Active' ? 'bg-green-500/80 text-white' : ''}>
-                        {item.status}
-                    </Badge>
+                      {/* We only show the "Active" badge for the most recent assignment */}
+                      {index === 0 ? (
+                         <Badge className={'bg-green-500/80 text-white'}>
+                            Active
+                         </Badge>
+                      ) : (
+                         <Badge variant="secondary">
+                            Previous
+                         </Badge>
+                      )}
                     </TableCell>
                 </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={4} className="h-24 text-center">
                       No assignment history found.
                     </TableCell>
                   </TableRow>

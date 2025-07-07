@@ -1,12 +1,5 @@
 import type { Assignment } from '@/types';
 
-const names = [
-  "Ahmad Ibrahim", "Siti Nurhaliza", "Lim Wei", "Rajesh Kumar", "Tan Mei Ling",
-  "David Chen", "Fatima Al-Jamil", "Michael Johnson", "Priya Sharma", "Wong Kim"
-];
-
-const sections = ['A', 'B', 'C', 'D'] as const;
-
-// Cleared mock data for publishing.
-// The application will start with a clean slate.
+// This file is now empty as the application uses Firebase Firestore for data persistence.
+// It is kept to prevent breaking existing imports, but it no longer provides any data.
 export const mockAssignments: Assignment[] = [];

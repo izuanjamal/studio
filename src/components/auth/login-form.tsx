@@ -26,6 +26,8 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { AppLogo } from '@/components/icons';
+import { useAuth } from '@/hooks/use-auth';
+import { getUser } from '@/lib/firestore';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -36,6 +38,7 @@ export function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { signInWithEmail } = useAuth();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -45,28 +48,36 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
-    // Simulate API call and role-based redirect
-    setTimeout(() => {
-      if (values.email === 'admin@example.com' && values.password === 'password') {
-        sessionStorage.setItem('userRole', 'admin');
-        toast({
-          title: 'Login Successful',
-          description: 'Welcome, Admin! Redirecting to your dashboard.',
-        });
+    try {
+      const userCredential = await signInWithEmail(values.email, values.password);
+      const user = userCredential.user;
+      
+      const userDetails = await getUser(user.uid);
+      const userRole = userDetails?.role || 'resident';
+
+      toast({
+        title: 'Login Successful',
+        description: `Welcome back! Redirecting...`,
+      });
+
+      if (userRole === 'admin') {
         router.push('/dashboard');
       } else {
-        sessionStorage.setItem('userRole', 'resident');
-        // For any other credentials, assume it's a resident
-        toast({
-          title: 'Login Successful',
-          description: `Welcome! Redirecting to your portal.`,
-        });
         router.push('/resident');
       }
+
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: 'Login Failed',
+        description: error.message || 'An unexpected error occurred.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -119,11 +130,6 @@ export function LoginForm() {
           </Link>
         </div>
       </CardContent>
-       <CardFooter>
-        <p className="text-center w-full text-xs text-muted-foreground">
-          <strong>Admin:</strong> admin@example.com / password
-        </p>
-      </CardFooter>
     </Card>
   );
 }

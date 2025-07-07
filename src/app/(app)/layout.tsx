@@ -1,20 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Car, User, LogOut, Settings, Home } from "lucide-react";
-import { useState, useEffect } from "react";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SidebarProvider,
   Sidebar,
@@ -29,24 +17,29 @@ import {
   SidebarMenuSkeleton
 } from "@/components/ui/sidebar";
 import { AppLogo } from "@/components/icons";
+import { useAuth } from "@/hooks/use-auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const { user, userDetails, loading, signOutUser } = useAuth();
   const router = useRouter();
-  const [userRole, setUserRole] = useState<'admin' | 'resident' | null>(null);
 
-  useEffect(() => {
-    // Reading from sessionStorage is a client-side only operation.
-    const role = sessionStorage.getItem('userRole') as 'admin' | 'resident';
-    setUserRole(role || 'resident'); // Default to resident if no role is found.
-  }, []);
-
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('userRole');
+  const handleLogout = async () => {
+    await signOutUser();
     router.push('/');
   }
 
+  const userRole = userDetails?.role;
   const homePath = userRole === 'admin' ? '/dashboard' : '/resident';
 
   const navItems = userRole === 'admin' ? [
@@ -54,6 +47,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ] : [
     { href: "/resident", icon: Car, label: "My Parking", "tooltip": "My Parking" },
   ];
+
+  const renderAvatar = () => {
+    if (loading || !userDetails) {
+      return <Skeleton className="h-10 w-10 rounded-full" />;
+    }
+    const fallback = userDetails.fullName ? userDetails.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : (userRole === 'admin' ? 'A' : 'R');
+    return (
+      <Avatar>
+        <AvatarImage src={userDetails.avatarUrl} alt="User Avatar" data-ai-hint="person avatar" />
+        <AvatarFallback>{fallback}</AvatarFallback>
+      </Avatar>
+    );
+  };
 
   return (
     <SidebarProvider>
@@ -66,22 +72,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {userRole ? navItems.map((item) => (
+            {loading ? <SidebarMenuSkeleton showIcon /> : navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.tooltip}>
+                <SidebarMenuButton asChild isActive={router.pathname === item.href} tooltip={item.tooltip}>
                   <Link href={item.href}>
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            )) : <SidebarMenuSkeleton showIcon />}
+            ))}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
            <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === homePath} tooltip="Home">
+                <SidebarMenuButton asChild isActive={router.pathname === homePath} tooltip="Home">
                     <Link href={homePath}>
                         <Home />
                         <span>Home</span>
@@ -89,7 +95,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/profile'} tooltip="Profile">
+                <SidebarMenuButton asChild isActive={router.pathname === '/profile'} tooltip="Profile">
                     <Link href="/profile">
                         <User />
                         <span>Profile</span>
@@ -97,7 +103,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/settings'} tooltip="Settings">
+                <SidebarMenuButton asChild isActive={router.pathname === '/settings'} tooltip="Settings">
                     <Link href="/settings">
                         <Settings />
                         <span>Settings</span>
@@ -123,11 +129,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     variant="outline"
                     size="icon"
                     className="overflow-hidden rounded-full"
+                    disabled={loading}
                   >
-                    <Avatar>
-                      <AvatarImage src="https://placehold.co/40x40.png" alt="User Avatar" data-ai-hint="person avatar" />
-                      <AvatarFallback>{userRole && (userRole === 'admin' ? 'A' : 'R')}</AvatarFallback>
-                    </Avatar>
+                    {renderAvatar()}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
