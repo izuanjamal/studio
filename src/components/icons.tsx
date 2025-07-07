@@ -18,3 +18,4 @@ export function AppLogo(props: AppLogoProps) {
       {...rest}
     />
   );
+}
