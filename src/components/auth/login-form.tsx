@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +20,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -50,13 +52,26 @@ export function LoginForm() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      toast({
-        title: 'Login Successful',
-        description: `Welcome! Redirecting to your dashboard.`,
-      });
       if (values.role === 'admin') {
-        router.push('/dashboard');
+        if (values.email === 'admin@example.com' && values.password === 'password') {
+          toast({
+            title: 'Login Successful',
+            description: 'Welcome, Admin! Redirecting to your dashboard.',
+          });
+          router.push('/dashboard');
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Invalid Credentials',
+            description: 'Please check your admin email and password.',
+          });
+        }
       } else {
+        // For residents, we'll just mock a successful login
+        toast({
+          title: 'Login Successful',
+          description: `Welcome! Redirecting to your portal.`,
+        });
         router.push('/resident');
       }
       setIsLoading(false);
@@ -136,7 +151,18 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
+        <div className="mt-4 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="underline">
+            Register
+          </Link>
+        </div>
       </CardContent>
+       <CardFooter>
+        <p className="text-center w-full text-xs text-muted-foreground">
+          <strong>Admin:</strong> admin@example.com / password
+        </p>
+      </CardFooter>
     </Card>
   );
 }
