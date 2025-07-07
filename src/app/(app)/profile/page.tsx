@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User, Building, Mail } from "lucide-react";
+import { User, Building, Mail, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -33,41 +33,46 @@ const profileSchema = z.object({
 export default function ProfilePage() {
   const [user, setUser] = useState(mockUser);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      fullName: user.fullName,
-      email: user.email,
-      unitNumber: user.unitNumber,
-    },
+    defaultValues: user,
   });
 
-  // This will reset the form with the latest user data when the dialog is opened.
   useEffect(() => {
     if (isDialogOpen) {
-      form.reset({
-        fullName: user.fullName,
-        email: user.email,
-        unitNumber: user.unitNumber,
-      });
+      form.reset(user);
+      setAvatarPreview(user.avatarUrl);
     }
   }, [isDialogOpen, user, form]);
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit = (values: z.infer<typeof profileSchema>) => {
-    // Simulate updating user data
     setUser(prevUser => ({
         ...prevUser,
         ...values,
-        // Regenerate fallback if name changes
+        avatarUrl: avatarPreview || prevUser.avatarUrl,
         avatarFallback: values.fullName.split(' ').map(n => n[0]).join('').toUpperCase(),
     }));
     toast({
         title: "Profile Updated",
         description: "Your profile information has been successfully updated.",
     });
-    setIsDialogOpen(false); // Close the dialog
+    setAvatarPreview(null);
+    setIsDialogOpen(false);
   };
 
   return (
@@ -103,6 +108,31 @@ export default function ProfilePage() {
                         </DialogHeader>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                                <div className="flex justify-center pb-4">
+                                    <div className="relative">
+                                        <Avatar className="h-24 w-24 cursor-pointer border" onClick={() => fileInputRef.current?.click()}>
+                                            <AvatarImage src={avatarPreview || ''} alt={user.fullName} />
+                                            <AvatarFallback className="text-3xl">{user.avatarFallback}</AvatarFallback>
+                                        </Avatar>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="icon"
+                                            className="absolute bottom-0 right-0 rounded-full"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <Camera className="h-4 w-4" />
+                                            <span className="sr-only">Upload Photo</span>
+                                        </Button>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                        />
+                                    </div>
+                                </div>
                                 <FormField
                                     control={form.control}
                                     name="fullName"
