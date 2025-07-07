@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -17,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import type { Assignment } from "@/types";
 import { getAllAssignments, deleteAllAssignments } from "@/lib/firestore";
@@ -95,14 +97,28 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <FileDown className="mr-2 h-4 w-4" />
-            Export Data
-          </Button>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Generate Assignments
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" disabled>
+                <FileDown className="mr-2 h-4 w-4" />
+                Export Data
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Feature coming soon</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button disabled>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Generate Assignments
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Feature coming soon</p>
+            </TooltipContent>
+          </Tooltip>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">
@@ -131,13 +147,8 @@ export default function DashboardPage() {
 
       <StatsCards assignments={assignments} />
       
-      <div className="grid gap-8 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <AssignmentChart assignments={assignments} />
-        </div>
-        <div className="lg:col-span-2">
-           {/* Placeholder for another chart or info panel */}
-        </div>
+      <div className="grid gap-8">
+        <AssignmentChart assignments={assignments} />
       </div>
       
       <AssignmentTable assignments={assignments} />
