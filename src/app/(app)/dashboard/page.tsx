@@ -133,7 +133,7 @@ export default function DashboardPage() {
       
       <div className="grid gap-8 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <AssignmentChart />
+          <AssignmentChart assignments={assignments} />
         </div>
         <div className="lg:col-span-2">
            {/* Placeholder for another chart or info panel */}
