@@ -72,6 +72,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarFooter>
            <SidebarMenu>
             <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/profile'} tooltip="Profile">
+                    <Link href="/profile">
+                        <User />
+                        <span>Profile</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/settings'} tooltip="Settings">
+                    <Link href="/settings">
+                        <Settings />
+                        <span>Settings</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
               <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
                 <LogOut />
                 <span>Logout</span>
@@ -92,7 +108,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      <AvatarImage src="https://placehold.co/40x40.png" alt="@shadcn" />
+                      <AvatarImage src="https://placehold.co/40x40.png" alt="User Avatar" data-ai-hint="person avatar" />
                       <AvatarFallback>{userRole === 'admin' ? 'A' : 'R'}</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -100,8 +116,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>{userRole === 'admin' ? 'Admin' : 'Resident'}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                 </DropdownMenuContent>
