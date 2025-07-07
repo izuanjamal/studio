@@ -58,7 +58,7 @@ export function RegisterForm() {
         title: 'Registration Successful',
         description: 'Your account has been created. Please log in.',
       });
-      router.push('/login');
+      router.push('/');
       setIsLoading(false);
     }, 1000);
   };
@@ -134,7 +134,7 @@ export function RegisterForm() {
         </Form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{' '}
-          <Link href="/login" className="underline">
+          <Link href="/" className="underline">
             Login
           </Link>
         </div>

@@ -44,7 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     sessionStorage.removeItem('userRole');
-    router.push('/login');
+    router.push('/');
   }
 
   const homePath = userRole === 'admin' ? '/dashboard' : '/resident';
