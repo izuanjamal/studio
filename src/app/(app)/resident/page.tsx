@@ -4,8 +4,8 @@ import { mockAssignments } from "@/lib/mock-data";
 
 export default function ResidentPage() {
   // In a real app, you would fetch the specific resident's data.
-  // Here, we'll use the first assignment as a mock for the logged-in user.
-  const currentAssignment = mockAssignments[0];
+  // Here, we'll use the second assignment as a mock for the logged-in user to match the profile page.
+  const currentAssignment = mockAssignments[1];
 
   return (
     <div className="flex flex-col gap-8">

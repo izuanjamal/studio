@@ -13,14 +13,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { mockAssignments } from '@/lib/mock-data';
 
-// Mock user data. In a real app, this would come from a session or context.
+// Mock user data derived from mockAssignments to ensure consistency.
 const mockUser = {
-  fullName: "Siti Nurhaliza",
-  email: "siti.nurhaliza@example.com",
-  unitNumber: "L05-02",
+  fullName: mockAssignments[1].residentName,
+  email: "siti.nurhaliza@example.com", // Keeping a static email for now
+  unitNumber: mockAssignments[1].unitNumber,
   avatarUrl: "https://placehold.co/100x100.png",
-  avatarFallback: "SN",
+  avatarFallback: mockAssignments[1].residentName.split(' ').map(n => n[0]).join('').toUpperCase(),
 };
 
 const profileSchema = z.object({
