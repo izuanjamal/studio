@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Car, User, LogOut, Settings } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,19 +25,25 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
-  SidebarInset
+  SidebarInset,
+  SidebarMenuSkeleton
 } from "@/components/ui/sidebar";
 import { AppLogo } from "@/components/icons";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [userRole, setUserRole] = useState<'admin' | 'resident' | null>(null);
 
-  // This is a mock role. In a real app, you'd get this from a context or session.
-  const userRole = pathname.startsWith('/dashboard') ? 'admin' : 'resident';
+  useEffect(() => {
+    // Reading from sessionStorage is a client-side only operation.
+    const role = sessionStorage.getItem('userRole') as 'admin' | 'resident';
+    setUserRole(role || 'resident'); // Default to resident if no role is found.
+  }, []);
+
 
   const handleLogout = () => {
-    // In a real app, you would clear the user session here.
+    sessionStorage.removeItem('userRole');
     router.push('/login');
   }
 
@@ -57,7 +64,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {navItems.map((item) => (
+            {userRole ? navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.tooltip}>
                   <Link href={item.href}>
@@ -66,7 +73,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            ))}
+            )) : <SidebarMenuSkeleton showIcon />}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -109,12 +116,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   >
                     <Avatar>
                       <AvatarImage src="https://placehold.co/40x40.png" alt="User Avatar" data-ai-hint="person avatar" />
-                      <AvatarFallback>{userRole === 'admin' ? 'A' : 'R'}</AvatarFallback>
+                      <AvatarFallback>{userRole && (userRole === 'admin' ? 'A' : 'R')}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>{userRole === 'admin' ? 'Admin' : 'Resident'}</DropdownMenuLabel>
+                  <DropdownMenuLabel>{userRole && (userRole === 'admin' ? 'Admin' : 'Resident')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>

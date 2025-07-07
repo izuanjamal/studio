@@ -50,12 +50,14 @@ export function LoginForm() {
     // Simulate API call and role-based redirect
     setTimeout(() => {
       if (values.email === 'admin@example.com' && values.password === 'password') {
+        sessionStorage.setItem('userRole', 'admin');
         toast({
           title: 'Login Successful',
           description: 'Welcome, Admin! Redirecting to your dashboard.',
         });
         router.push('/dashboard');
       } else {
+        sessionStorage.setItem('userRole', 'resident');
         // For any other credentials, assume it's a resident
         toast({
           title: 'Login Successful',
